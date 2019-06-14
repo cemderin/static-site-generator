@@ -2,10 +2,12 @@ const fs = require('fs');
 const fse = require('fs-extra');
 const pug = require('pug');
 const markdown = require( "marked" );
+const lexer = require( "marked" ).lexer;
 const chalk = require('chalk');
 const sass = require('node-sass');
 const webpack = require('webpack');
 const path = require('path');
+const chokidar = require('chokidar');
 
 const cwd = process.cwd();
 const srcDirectory = [cwd, 'src', 'markdown'].join('/');
@@ -14,10 +16,14 @@ const stylesPath = [cwd, 'src', 'scss', 'index.scss'].join('/');
 const scriptsPath = [cwd, 'src', 'js', 'index.js'].join('/');
 const buildDirectory = [cwd, 'build'].join('/');
 
-function staticSiteGenerator() {
+function staticSiteGenerator(_options) {
+    if(!_options) _options = {};
+
     crawlDirectory(srcDirectory);
     renderCss(stylesPath);
     compileJs(scriptsPath);
+
+    if(_options.watch) watch();
 };
 
 function crawlDirectory(_directory) {
@@ -43,14 +49,21 @@ function crawlDirectory(_directory) {
 
 function renderFile(_path) {
     console.log([
-        chalk.green('Render  '),
+        chalk.green('Render'),
         chalk.green.bold(_path),
-    ].join(''));
+    ].join(' '));
     const fileContent = fs.readFileSync(_path);
-    const renderedFileContent = pug.renderFile([templatesDirectory, 'default.pug'].join('/'), {
+    const fileSettings = lexer(fileContent.toString());
+
+    const settings = {
         content: markdown(fileContent.toString()),
         pretty: true
-    });
+    };
+
+    if(fileSettings.links._title) settings.pageTitle = fileSettings.links._title.title;
+    if(fileSettings.links._description) settings.description = fileSettings.links._description.title;
+
+    const renderedFileContent = pug.renderFile([templatesDirectory, 'default.pug'].join('/'), settings);
 
     const outputPath = [buildDirectory, _path.replace(srcDirectory+'/', '').replace('.md', '.html')].join('/');
 
@@ -61,9 +74,9 @@ function renderFile(_path) {
 
 function renderCss(_file) {
     console.log([
-        chalk.magenta('Compile '),
+        chalk.magenta('Compile'),
         chalk.magenta.bold(_file),
-    ].join(''));
+    ].join(' '));
     sass.render({
         file: _file,
         outFile: [buildDirectory, 'index.css'].join('/'),
@@ -99,6 +112,22 @@ function compileJs(_file) {
         }
     }, (err, result) => {
         if(err) console.error('Webpack error', err)
+    });
+}
+
+function watch() {
+    chokidar.watch(srcDirectory).on('all', (event, path) => {
+        console.info([
+            chalk.gray('Watch'),
+            chalk.gray.bold(event),
+            chalk.gray.bold(path),
+        ].join(' '));
+
+        switch(event) {
+            case 'change':
+                renderFile(path);
+            default:
+        }
     });
 }
 
