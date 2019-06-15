@@ -13,6 +13,7 @@ const ncp = require('ncp').ncp;
 const slugify = require('slugify')
 
 
+let options = null;
 const cwd = process.cwd();
 const srcDirectory = [cwd, 'src', 'markdown'].join('/');
 const templatesDirectory = [cwd, 'src', 'pug', 'templates'].join('/');
@@ -21,16 +22,15 @@ const scriptsPath = [cwd, 'src', 'js', 'index.js'].join('/');
 const buildDirectory = [cwd, 'build'].join('/');
 
 function staticSiteGenerator(_options) {
-    if(!_options) _options = {};
+    options = _options;
 
     crawlDirectory(srcDirectory);
     renderCss(stylesPath);
     compileJs(scriptsPath);
     copyAssets();
 
-    if(_options.watch) {
+    if(options._all.mode === 'development') {
         watch();
-
         browserSync({
             server: "build",
             files: ["build/**/*.html", "build/*.css", "build/*.js"]
@@ -85,6 +85,8 @@ function renderFile(_path) {
 
     settings.srcPath = _path.replace(srcDirectory, '');
 
+    settings.baseDir = options._all['base-dir'];
+
     if(fileSettings.links._title) settings.pageTitle = fileSettings.links._title.title;
     if(fileSettings.links._description) settings.description = fileSettings.links._description.title;
 
@@ -94,8 +96,6 @@ function renderFile(_path) {
 
         }
     }
-
-    console.log('settings', settings)
 
     let renderedFileContent = pug.renderFile([templatesDirectory, 'default.pug'].join('/'), settings);
 
@@ -219,10 +219,7 @@ function copyAssets() {
         [cwd, 'src', 'assets'].join('/'),
         [buildDirectory, 'assets'].join('/'),
         function (err) {
-            if (err) {
-                return console.error(err);
-            }
-            console.log('done!');
+            if (err) return console.error(err);
         });
 }
 
