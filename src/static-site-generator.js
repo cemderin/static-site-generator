@@ -8,6 +8,9 @@ const sass = require('node-sass');
 const webpack = require('webpack');
 const path = require('path');
 const chokidar = require('chokidar');
+const browserSync = require('browser-sync');
+const ncp = require('ncp').ncp;
+
 
 const cwd = process.cwd();
 const srcDirectory = [cwd, 'src', 'markdown'].join('/');
@@ -22,8 +25,16 @@ function staticSiteGenerator(_options) {
     crawlDirectory(srcDirectory);
     renderCss(stylesPath);
     compileJs(scriptsPath);
+    copyAssets();
 
-    if(_options.watch) watch();
+    if(_options.watch) {
+        watch();
+
+        browserSync({
+            server: "build",
+            files: ["build/**/*.html", "build/*.css", "build/*.js"]
+        });
+    }
 };
 
 function crawlDirectory(_directory) {
@@ -57,13 +68,20 @@ function renderFile(_path) {
 
     const settings = {
         content: markdown(fileContent.toString()),
-        pretty: true
+        // pretty: true
     };
 
     if(fileSettings.links._title) settings.pageTitle = fileSettings.links._title.title;
     if(fileSettings.links._description) settings.description = fileSettings.links._description.title;
 
-    const renderedFileContent = pug.renderFile([templatesDirectory, 'default.pug'].join('/'), settings);
+    let renderedFileContent = pug.renderFile([templatesDirectory, 'default.pug'].join('/'), settings);
+
+    const regex = /(href=".*?)\.(md)/gm;
+    const subst = '$1.html';
+
+    // The substituted value will be contained in the result variable
+    renderedFileContent = renderedFileContent.replace(regex, subst);
+
 
     const outputPath = [buildDirectory, _path.replace(srcDirectory+'/', '').replace('.md', '.html')].join('/');
 
@@ -80,7 +98,7 @@ function renderCss(_file) {
     sass.render({
         file: _file,
         outFile: [buildDirectory, 'index.css'].join('/'),
-        outputStyle: 'compressed',
+        // outputStyle: 'compressed',
         sourceMap: true
     }, (err, result) => {
         if(err) console.error(err);
@@ -125,10 +143,64 @@ function watch() {
 
         switch(event) {
             case 'change':
-                renderFile(path);
+                crawlDirectory(srcDirectory);
             default:
         }
     });
+
+    chokidar.watch([cwd, 'src', 'scss'].join('/')).on('all', (event, path) => {
+        console.info([
+            chalk.gray('Watch'),
+            chalk.gray.bold(event),
+            chalk.gray.bold(path),
+        ].join(' '));
+
+        switch(event) {
+            case 'change':
+                renderCss(stylesPath);
+            default:
+        }
+    });
+
+    chokidar.watch([cwd, 'src', 'js'].join('/')).on('all', (event, path) => {
+        console.info([
+            chalk.gray('Watch'),
+            chalk.gray.bold(event),
+            chalk.gray.bold(path),
+        ].join(' '));
+
+        switch(event) {
+            case 'change':
+                compileJs(scriptsPath);
+            default:
+        }
+    });
+
+    chokidar.watch(templatesDirectory).on('all', (event, path) => {
+        console.info([
+            chalk.gray('Watch'),
+            chalk.gray.bold(event),
+            chalk.gray.bold(path),
+        ].join(' '));
+
+        switch(event) {
+            case 'change':
+                crawlDirectory(srcDirectory);
+            default:
+        }
+    });
+}
+
+function copyAssets() {
+    ncp(
+        [cwd, 'src', 'assets'].join('/'),
+        [buildDirectory, 'assets'].join('/'),
+        function (err) {
+            if (err) {
+                return console.error(err);
+            }
+            console.log('done!');
+        });
 }
 
 module.exports = staticSiteGenerator;
