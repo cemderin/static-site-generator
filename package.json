@@ -1,5 +1,5 @@
 {
-  "name": "static-site-generator",
+  "name": "@cemderin/static-site-generator",
   "version": "0.0.0",
   "description": "simple static site generator",
   "main": "index.js",
