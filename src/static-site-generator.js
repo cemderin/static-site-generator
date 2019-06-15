@@ -10,6 +10,7 @@ const path = require('path');
 const chokidar = require('chokidar');
 const browserSync = require('browser-sync');
 const ncp = require('ncp').ncp;
+const slugify = require('slugify')
 
 
 const cwd = process.cwd();
@@ -68,8 +69,19 @@ function renderFile(_path) {
 
     const settings = {
         content: markdown(fileContent.toString()),
-        // pretty: true
     };
+
+    let toc = [];
+    fileSettings.forEach((item) => {
+        if(item.type === 'heading' && item.depth === 2) {
+            toc.push({
+                title: item.text,
+                slug: '#' + slugify(item.text.toLowerCase()),
+            });
+        }
+    });
+
+    settings.toc = toc;
 
     if(fileSettings.links._title) settings.pageTitle = fileSettings.links._title.title;
     if(fileSettings.links._description) settings.description = fileSettings.links._description.title;
