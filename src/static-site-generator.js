@@ -83,12 +83,23 @@ function renderFile(_path) {
 
     settings.toc = toc;
 
+    settings.srcPath = _path.replace(srcDirectory, '');
+
     if(fileSettings.links._title) settings.pageTitle = fileSettings.links._title.title;
     if(fileSettings.links._description) settings.description = fileSettings.links._description.title;
 
+    for(let prop in fileSettings.links) {
+        if(prop.substr(0, 1) === '_') {
+            settings[prop.substr(1)] = fileSettings.links[prop].title;
+
+        }
+    }
+
+    console.log('settings', settings)
+
     let renderedFileContent = pug.renderFile([templatesDirectory, 'default.pug'].join('/'), settings);
 
-    const regex = /(href=".*?)\.(md)/gm;
+    const regex = /(href="(?!http:|https:).*?)\.(md)/gm;
     const subst = '$1.html';
 
     // The substituted value will be contained in the result variable
