@@ -1,0 +1,6 @@
+dist: xenial
+
+before_install:
+  - yarn
+
+script: yarn test

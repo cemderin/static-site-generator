@@ -11,6 +11,7 @@
     "chalk": "^2.4.2",
     "chokidar": "^3.0.1",
     "command-line-args": "^5.1.1",
+    "eslint": "^5.16.0",
     "fs-extra": "^8.0.1",
     "marked": "^0.6.2",
     "ncp": "^2.0.0",
@@ -20,10 +21,6 @@
     "webpack": "^4.34.0"
   },
   "scripts": {
-    "pretest": "eslint .",
-    "test": "return null"
-  },
-  "devDependencies": {
-    "eslint": "^5.16.0"
+    "test": "node node_modules/eslint/bin/eslint.js . --fix"
   }
 }

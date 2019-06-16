@@ -46,6 +46,12 @@ function crawlDirectory(_directory) {
         if(err) console.error(err)
         if(!err) {
             files.forEach((file) => {
+                console.log([
+                    chalk.yellow('Handle file'),
+                    chalk.yellow.bold(file),
+                    chalk.yellow('in directory'),
+                    chalk.yellow.bold(_directory)
+                ].join(''));
                 if(file.isDirectory()) {
                     crawlDirectory([_directory, file.name].join('/'))
                 } else {
