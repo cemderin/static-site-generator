@@ -1,6 +1,13 @@
 dist: xenial
-
 before_install:
-  - yarn
-
+- yarn
 script: yarn test
+
+deploy:
+  provider: npm
+  email: cemyderin@gmail.com
+  api_key:
+    secure: a1TO5x0WqnB6/e9N2UofKqtM5yPZvS0biEPpucoJ42l7b0znQhRoGNhpD6bj6ljRBjplEtvjsNxsT+E9mSwvE/DHEBbVmrzUJwVbHz5bZtfAAxQLWGSi2GcjnqHsgCOl9OBBPEsljTyyNtVyVNUeZxAhbUugqdYMprG85FwixyXmItrL4YvTi3jDTCDVMx05xZkDHt0+EM2g67AIIR85e4gxVxG5Nv9uMdHeo89s/ts7ObIzdpNfAcc1T7C0xLHEtTnf738kB1u7r7PRAl7/9ei5HuShrIJLL4BHNQzs1P8/xxuzhmYzcqIMZKC1VsAK+jENcwxwbQGE9NPvhipaM8rJE0/mcBvw7dmLIY01kN4fz31eSKBrEjiGrwOoKevMllfqfFL5dHKcuf6cjJEDniLM7645/mSb1C8QBP36RoOmqvctbZd8qYC3d9ZUtARvgnnYTwKb5Fb7grZjWcdaTjSLpULUGsgbqmAWJLfXg+VjUFwn7IAXEaXjmsXoorsRWI7/4LjFWPS0c8KR4xbRq9Zc01zbIXzmsQC8WfZFLw73zyVZ9+kJgL7/toR4r+ZYUsSy9DEZC/L8pPWmelblb5IwmAN457lzSNyWjVw6muHkQJV7O6IF9Tumw9Rgiy0S9P73O8QJJOdphczh05BdJrL8rgW/tDhAThdlMWj/Ry8=
+  on:
+    tags: true
+    repo: cemderin/static-site-generator
