@@ -6,7 +6,6 @@ const lexer = require( "marked" ).lexer;
 const chalk = require('chalk');
 const sass = require('node-sass');
 const webpack = require('webpack');
-const path = require('path');
 const chokidar = require('chokidar');
 const browserSync = require('browser-sync');
 const ncp = require('ncp').ncp;
@@ -36,7 +35,7 @@ function staticSiteGenerator(_options) {
             files: ["build/**/*.html", "build/*.css", "build/*.js"]
         });
     }
-};
+}
 
 function crawlDirectory(_directory) {
     console.log([
@@ -151,7 +150,7 @@ function compileJs(_file) {
             filename: 'index.js',
             path: buildDirectory
         }
-    }, (err, result) => {
+    }, (err) => {
         if(err) console.error('Webpack error', err)
     });
 }

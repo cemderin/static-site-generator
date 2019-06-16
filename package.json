@@ -18,5 +18,12 @@
     "pug": "^2.0.3",
     "slugify": "^1.3.4",
     "webpack": "^4.34.0"
+  },
+  "scripts": {
+    "pretest": "eslint .",
+    "test": "return null"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0"
   }
 }
