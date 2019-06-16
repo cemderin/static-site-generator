@@ -1,6 +1,6 @@
 {
   "name": "@cemderin/static-site-generator",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "simple static site generator",
   "main": "index.js",
   "repository": "https://cemderin@github.com/cemderin/static-site-generator.git",
