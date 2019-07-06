@@ -15,7 +15,8 @@ const slugify = require('slugify')
 let options = null;
 const cwd = process.cwd();
 const srcDirectory = [cwd, 'src', 'markdown'].join('/');
-const templatesDirectory = [cwd, 'src', 'pug', 'templates'].join('/');
+const pugDirectory = [cwd, 'src', 'pug'].join('/');
+const templatesDirectory = [pugDirectory, 'templates'].join('/');
 const stylesPath = [cwd, 'src', 'scss', 'index.scss'].join('/');
 const scriptsPath = [cwd, 'src', 'js', 'index.js'].join('/');
 const buildDirectory = [cwd, 'build'].join('/');
@@ -51,7 +52,7 @@ function crawlDirectory(_directory) {
                     chalk.yellow.bold(file),
                     chalk.yellow('in directory'),
                     chalk.yellow.bold(_directory)
-                ].join(''));
+                ].join(' '));
                 if(file.isDirectory()) {
                     crawlDirectory([_directory, file.name].join('/'))
                 } else {
@@ -102,7 +103,9 @@ function renderFile(_path) {
         }
     }
 
-    let renderedFileContent = pug.renderFile([templatesDirectory, 'default.pug'].join('/'), settings);
+    let templateFile = 'default';
+    if(fileSettings.links._template) templateFile = fileSettings.links._template.title;
+    let renderedFileContent = pug.renderFile([templatesDirectory, templateFile + '.pug'].join('/'), settings);
 
     const regex = /(href="(?!http:|https:).*?)\.(md)/gm;
     const subst = '$1.html';
@@ -204,7 +207,7 @@ function watch() {
         }
     });
 
-    chokidar.watch(templatesDirectory).on('all', (event, path) => {
+    chokidar.watch(pugDirectory).on('all', (event, path) => {
         console.info([
             chalk.gray('Watch'),
             chalk.gray.bold(event),
