@@ -13,7 +13,7 @@
     "command-line-args": "^5.1.1",
     "eslint": "^5.16.0",
     "fs-extra": "^8.0.1",
-    "marked": "^0.6.2",
+    "marked": "^4.0.10",
     "ncp": "^2.0.0",
     "node-sass": "^4.12.0",
     "pug": "^2.0.3",
